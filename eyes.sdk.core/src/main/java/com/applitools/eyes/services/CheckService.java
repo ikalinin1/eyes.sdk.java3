@@ -12,6 +12,8 @@ import java.util.*;
 
 public class CheckService extends EyesService<MatchWindowData, MatchResult> {
 
+    private final Map<String, List<String>> testsToSteps = Collections.synchronizedMap(new HashMap<String, List<String>>());
+
     // Queue for tests that finished uploading and waiting for match window
     private final List<Pair<String, MatchWindowData>> matchWindowQueue = Collections.synchronizedList(new ArrayList<Pair<String, MatchWindowData>>());
 
@@ -27,6 +29,11 @@ public class CheckService extends EyesService<MatchWindowData, MatchResult> {
         while (!inputQueue.isEmpty()) {
             final Pair<String, MatchWindowData> nextInput = inputQueue.remove(0);
             final MatchWindowData matchWindowData = nextInput.getRight();
+            if (!testsToSteps.containsKey(matchWindowData.getTestId())) {
+                testsToSteps.put(matchWindowData.getTestId(), new ArrayList<String>());
+            }
+
+            testsToSteps.get(matchWindowData.getTestId()).add(nextInput.getLeft());
             inUploadProcess.add(nextInput.getLeft());
             tryUploadImage(nextInput.getLeft(), matchWindowData, new ServiceTaskListener<Void>() {
                 @Override
@@ -38,31 +45,43 @@ public class CheckService extends EyesService<MatchWindowData, MatchResult> {
                 @Override
                 public void onFail(Throwable t) {
                     inUploadProcess.remove(nextInput.getLeft());
+                    testsToSteps.get(matchWindowData.getTestId()).remove(nextInput.getLeft());
                     errorQueue.add(Pair.of(nextInput.getLeft(), t));
                 }
             });
         }
 
+        List<Pair<String, MatchWindowData>> unreadyTasks = new ArrayList<>();
         while (!matchWindowQueue.isEmpty()) {
             final Pair<String, MatchWindowData> nextInput = matchWindowQueue.remove(0);
             final MatchWindowData matchWindowData = nextInput.getRight();
+            if (matchWindowData.getRunningSession() == null ||
+                    testsToSteps.get(matchWindowData.getTestId()).indexOf(nextInput.getLeft()) != 0) {
+                // If the test isn't open or there are unfinished previous steps of the same test, we won't start this step.
+                unreadyTasks.add(nextInput);
+                continue;
+            }
+
             inMatchWindowProcess.add(nextInput.getLeft());
             ServiceTaskListener<MatchResult> listener = new ServiceTaskListener<MatchResult>() {
                 @Override
                 public void onComplete(MatchResult taskResponse) {
                     inMatchWindowProcess.remove(nextInput.getLeft());
+                    testsToSteps.get(matchWindowData.getTestId()).remove(nextInput.getLeft());
                     outputQueue.add(Pair.of(nextInput.getLeft(), taskResponse));
                 }
 
                 @Override
                 public void onFail(Throwable t) {
                     inMatchWindowProcess.remove(nextInput.getLeft());
+                    testsToSteps.get(matchWindowData.getTestId()).remove(nextInput.getLeft());
                     errorQueue.add(Pair.of(nextInput.getLeft(), t));
                 }
             };
 
             matchWindow(nextInput.getLeft(), matchWindowData, listener);
         }
+        matchWindowQueue.addAll(unreadyTasks);
     }
 
     public void tryUploadImage(final String testId, MatchWindowData data, final ServiceTaskListener<Void> taskListener) {

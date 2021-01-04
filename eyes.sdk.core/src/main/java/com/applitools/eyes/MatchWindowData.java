@@ -104,11 +104,9 @@ public class MatchWindowData {
         public String getRenderId() {
             return renderId;
         }
-
     }
 
     // TODO Remove redundancy: userInputs and ignoreMismatch should only be inside Options. (requires server version update).
-
     private final Trigger[] userInputs;
     private final AppOutput appOutput;
     private final String tag;
@@ -116,8 +114,11 @@ public class MatchWindowData {
     private final Options options;
     private final Object agentSetup;
     private String renderId;
+
     @JsonIgnore
-    private final RunningSession runningSession;
+    private final String testId;
+    @JsonIgnore
+    private RunningSession runningSession;
 
     /**
      * @param userInputs     A list of triggers between the previous matchWindow
@@ -129,12 +130,13 @@ public class MatchWindowData {
      * @param options        A set of match options for the server.
      * @param agentSetup     An object representing the configuration used to create the image.
      */
-    public MatchWindowData(RunningSession runningSession, Trigger[] userInputs, AppOutput appOutput,
+    public MatchWindowData(String testId, RunningSession runningSession, Trigger[] userInputs, AppOutput appOutput,
                            String tag, boolean ignoreMismatch,
                            Options options, Object agentSetup, String renderId) {
 
         ArgumentGuard.notNull(userInputs, "userInputs");
 
+        this.testId = testId;
         this.userInputs = userInputs;
         this.appOutput = appOutput;
         this.tag = tag;
@@ -177,7 +179,15 @@ public class MatchWindowData {
         return agentSetup;
     }
 
+    public void setRunningSession(RunningSession runningSession) {
+        this.runningSession = runningSession;
+    }
+
     public RunningSession getRunningSession() {
         return runningSession;
+    }
+
+    public String getTestId() {
+        return testId;
     }
 }

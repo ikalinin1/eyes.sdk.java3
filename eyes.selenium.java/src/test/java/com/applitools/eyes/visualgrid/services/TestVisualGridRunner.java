@@ -11,7 +11,6 @@ import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -25,7 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.spy;
 
 public class TestVisualGridRunner {
 
@@ -175,68 +175,6 @@ public class TestVisualGridRunner {
         }
 
         Assert.assertEquals(counter.get(), 4);
-    }
-
-    @Test
-    public void testConcurrencyAmount() {
-        VisualGridRunner runner = new VisualGridRunner();
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, VisualGridRunner.DEFAULT_CONCURRENCY);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, VisualGridRunner.DEFAULT_CONCURRENCY);
-        Assert.assertTrue(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner("");
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, VisualGridRunner.DEFAULT_CONCURRENCY);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, VisualGridRunner.DEFAULT_CONCURRENCY);
-        Assert.assertTrue(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(10);
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 50);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 10);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertTrue(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(5, "");
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 25);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 5);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertTrue(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(new RunnerOptions().testConcurrency(5));
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 5);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 5);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(new RunnerOptions().testConcurrency(5).testConcurrency(7));
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 7);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 7);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(new RunnerOptions().testConcurrency(10), "");
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 10);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 10);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-    }
-
-    @Test
-    public void testConcurrencyLogMessage() throws JsonProcessingException {
-        VisualGridRunner runner = new VisualGridRunner();
-        Assert.assertEquals(runner.getConcurrencyLog(),
-                String.format("{\"type\":\"runnerStarted\",\"defaultConcurrency\":%d}", VisualGridRunner.DEFAULT_CONCURRENCY));
-
-        runner = new VisualGridRunner(10);
-        Assert.assertEquals(runner.getConcurrencyLog(),
-                String.format("{\"type\":\"runnerStarted\",\"concurrency\":%d}", 10));
-
-        runner = new VisualGridRunner(new RunnerOptions().testConcurrency(10));
-        Assert.assertEquals(runner.getConcurrencyLog(),
-                String.format("{\"type\":\"runnerStarted\",\"testConcurrency\":%d}", 10));
-
-        Assert.assertNull(runner.getConcurrencyLog());
     }
 
     @Test
