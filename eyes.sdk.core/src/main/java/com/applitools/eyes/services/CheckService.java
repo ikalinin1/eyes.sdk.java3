@@ -35,7 +35,7 @@ public class CheckService extends EyesService<MatchWindowData, MatchResult> {
 
             testsToSteps.get(matchWindowData.getTestId()).add(nextInput.getLeft());
             inUploadProcess.add(nextInput.getLeft());
-            tryUploadImage(nextInput.getLeft(), matchWindowData, new ServiceTaskListener<Void>() {
+            tryUploadImage(matchWindowData, new ServiceTaskListener<Void>() {
                 @Override
                 public void onComplete(Void output) {
                     inUploadProcess.remove(nextInput.getLeft());
@@ -79,12 +79,12 @@ public class CheckService extends EyesService<MatchWindowData, MatchResult> {
                 }
             };
 
-            matchWindow(nextInput.getLeft(), matchWindowData, listener);
+            matchWindow(matchWindowData, listener);
         }
         matchWindowQueue.addAll(unreadyTasks);
     }
 
-    public void tryUploadImage(final String testId, MatchWindowData data, final ServiceTaskListener<Void> taskListener) {
+    public void tryUploadImage(final MatchWindowData data, final ServiceTaskListener<Void> taskListener) {
         final AppOutput appOutput = data.getAppOutput();
         if (appOutput.getScreenshotUrl() != null) {
             taskListener.onComplete(null);
@@ -100,7 +100,7 @@ public class CheckService extends EyesService<MatchWindowData, MatchResult> {
                     return;
                 }
 
-                logger.log(TraceLevel.Info, Collections.singleton(testId), Stage.CHECK, Type.UPLOAD_COMPLETE, Pair.of("url", s));
+                logger.log(TraceLevel.Info, Collections.singleton(data.getTestId()), Stage.CHECK, Type.UPLOAD_COMPLETE, Pair.of("url", s));
                 appOutput.setScreenshotUrl(s);
                 taskListener.onComplete(null);
             }
@@ -113,20 +113,20 @@ public class CheckService extends EyesService<MatchWindowData, MatchResult> {
         };
 
         try {
-            logger.log(TraceLevel.Info, Collections.singleton(testId), Stage.CHECK, Type.UPLOAD_START, Pair.of("matchWindowData", matchWindowQueue));
+            logger.log(TraceLevel.Info, Collections.singleton(data.getTestId()), Stage.CHECK, Type.UPLOAD_START, Pair.of("matchWindowData", matchWindowQueue));
             serverConnector.uploadImage(uploadListener, appOutput.getScreenshotBytes());
         } catch (Throwable t) {
             taskListener.onFail(t);
         }
     }
 
-    public void matchWindow(final String testId, MatchWindowData data, final ServiceTaskListener<MatchResult> listener) {
+    public void matchWindow(final MatchWindowData data, final ServiceTaskListener<MatchResult> listener) {
         try {
-            logger.log(TraceLevel.Info, Collections.singleton(testId), Stage.CHECK, Type.MATCH_START, Pair.of("matchWindowData", data));
+            logger.log(TraceLevel.Info, Collections.singleton(data.getTestId()), Stage.CHECK, Type.MATCH_START, Pair.of("matchWindowData", data));
             serverConnector.matchWindow(new TaskListener<MatchResult>() {
                 @Override
                 public void onComplete(MatchResult taskResponse) {
-                    logger.log(testId, Stage.CHECK, Type.MATCH_COMPLETE, Pair.of("matchResult", taskResponse));
+                    logger.log(data.getTestId(), Stage.CHECK, Type.MATCH_COMPLETE, Pair.of("matchResult", taskResponse));
                     listener.onComplete(taskResponse);
                 }
 

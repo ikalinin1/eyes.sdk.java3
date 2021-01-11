@@ -25,7 +25,7 @@ public class ClassicRunner extends EyesRunner implements IClassicRunner {
     }
 
     public ClassicRunner(String suiteName) {
-        this(new RunnerOptions().testConcurrency(100), suiteName);
+        this(new RunnerOptions().testConcurrency(Integer.MAX_VALUE), suiteName);
         testConcurrency.isDefault = true;
         init();
     }
@@ -95,9 +95,9 @@ public class ClassicRunner extends EyesRunner implements IClassicRunner {
         return runningSession;
     }
 
-    public MatchResult check(final String testId, MatchWindowData matchWindowData) {
+    public MatchResult check(final MatchWindowData matchWindowData) {
         final SyncTaskListener<Boolean> listener = new SyncTaskListener<>(logger, String.format("uploadImage %s", matchWindowData.getRunningSession()));
-        checkService.tryUploadImage(testId, matchWindowData, new ServiceTaskListener<Void>() {
+        checkService.tryUploadImage(matchWindowData, new ServiceTaskListener<Void>() {
             @Override
             public void onComplete(Void taskResponse) {
                 listener.onComplete(true);
@@ -105,7 +105,7 @@ public class ClassicRunner extends EyesRunner implements IClassicRunner {
 
             @Override
             public void onFail(Throwable t) {
-                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.UPLOAD_COMPLETE, t, testId);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.UPLOAD_COMPLETE, t, matchWindowData.getTestId());
                 listener.onFail();
             }
         });
@@ -116,7 +116,7 @@ public class ClassicRunner extends EyesRunner implements IClassicRunner {
         }
 
         final SyncTaskListener<MatchResult> matchListener = new SyncTaskListener<>(logger, String.format("performMatch %s", matchWindowData.getRunningSession()));
-        checkService.matchWindow(testId, matchWindowData, new ServiceTaskListener<MatchResult>() {
+        checkService.matchWindow(matchWindowData, new ServiceTaskListener<MatchResult>() {
             @Override
             public void onComplete(MatchResult taskResponse) {
                 matchListener.onComplete(taskResponse);
@@ -124,7 +124,7 @@ public class ClassicRunner extends EyesRunner implements IClassicRunner {
 
             @Override
             public void onFail(Throwable t) {
-                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.MATCH_COMPLETE, t, testId);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.MATCH_COMPLETE, t, matchWindowData.getTestId());
                 matchListener.onFail();
             }
         });

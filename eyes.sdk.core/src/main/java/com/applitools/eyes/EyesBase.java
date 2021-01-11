@@ -622,7 +622,7 @@ public abstract class EyesBase implements IEyesBase {
 
     public MatchResult performMatch(MatchWindowData data) {
         ClassicRunner classicRunner = (ClassicRunner) runner;
-        MatchResult result = classicRunner.check(getTestId(), data);
+        MatchResult result = classicRunner.check(data);
         if (result == null) {
             throw new EyesException("Failed performing match with the server");
         }
