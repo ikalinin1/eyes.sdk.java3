@@ -31,6 +31,7 @@ public class TestSessionStartInfo extends ReportingTestSuite {
         instance.setTimeZone(TimeZone.getTimeZone("GMT"));
         BatchInfo batchInfo = new BatchInfo("some batch", instance);
         batchInfo.setId("someBatchId");
+        batchInfo.addProperty("key", "val");
         ImageMatchSettings ims = new ImageMatchSettings();
         ims.setMatchLevel(MatchLevel.STRICT);
         AccessibilityRegionByRectangle[] accessibilityValidation = {new AccessibilityRegionByRectangle(10, 20, 30, 40, AccessibilityRegionType.GraphicalObject)};
