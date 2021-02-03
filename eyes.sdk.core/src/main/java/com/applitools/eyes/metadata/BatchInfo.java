@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -29,6 +31,9 @@ public class BatchInfo {
     @JsonProperty("startedAt")
     @JsonDeserialize(using = Iso8610CalendarDeserializer.class)
     private Calendar startedAt;
+
+    @JsonProperty("properties")
+    private List<Map<String, String>> properties;
 
     @JsonProperty("id")
     public String getId() {
@@ -67,5 +72,13 @@ public class BatchInfo {
 
     public void setSequenceName(String sequenceName) {
         this.sequenceName = sequenceName;
+    }
+
+    public List<Map<String, String>> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(List<Map<String, String>> properties) {
+        this.properties = properties;
     }
 }

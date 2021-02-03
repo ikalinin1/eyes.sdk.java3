@@ -32,6 +32,7 @@ public class BatchInfo {
     @JsonProperty("isCompleted")
     private boolean isCompleted = false;
 
+    @JsonProperty("properties")
     private final List<Map<String, String>> properties = new ArrayList<>();
 
     /**
@@ -173,12 +174,13 @@ public class BatchInfo {
         isCompleted = completed;
     }
 
-    public BatchInfo addProperty(final String key, final String value) {
-        properties.add(new HashMap<String, String>() {{put(key, value);}});
+    public BatchInfo addProperty(final String name, final String value) {
+        properties.add(new HashMap<String, String>() {{put("name", name);put("value", value);}});
         return this;
     }
 
+    @JsonIgnore
     public List<Map<String, String>> getProperties() {
-        return properties;
+        return this.properties;
     }
 }
