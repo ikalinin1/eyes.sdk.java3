@@ -10,7 +10,11 @@
     "name" : "some batch",
     "startedAt" : "2017-07-29T11:01:00Z",
     "notifyOnCompletion" : false,
-    "isCompleted" : false
+    "isCompleted" : false,
+    "properties" : [ {
+      "name" : "key",
+      "value" : "val"
+    } ]
   },
   "baselineEnvName" : "baseline",
   "environmentName" : "some environment",
