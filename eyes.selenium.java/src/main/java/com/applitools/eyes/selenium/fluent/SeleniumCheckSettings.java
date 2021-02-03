@@ -111,6 +111,8 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         clone.scrollRootSelector = this.scrollRootSelector;
         clone.selector = this.selector;
         clone.sendDom = this.sendDom;
+        clone.isDefaultLayoutBreakpointsSet = this.isDefaultLayoutBreakpointsSet;
+        clone.layoutBreakpoints.addAll(this.layoutBreakpoints);
         return clone;
     }
 

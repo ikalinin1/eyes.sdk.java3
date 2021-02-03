@@ -453,13 +453,13 @@ public class TestRenderings extends ReportingTestSuite {
         map = eyes.mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
         Assert.assertTrue(map.isEmpty());
 
-        seleniumCheckSettings = Target.window().layoutBreakpoints(true);
+        seleniumCheckSettings = Target.window().layoutBreakpoints(true).clone();
         map = eyes.mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
         Assert.assertEquals(map.keySet(), new HashSet<>(Arrays.asList(700, 1000)));
         Assert.assertEquals(map.get(700).size(), 1);
         Assert.assertEquals(map.get(1000).size(), 2);
 
-        seleniumCheckSettings = Target.window().layoutBreakpoints(750, 1200);
+        seleniumCheckSettings = Target.window().layoutBreakpoints(750, 1200).clone();
         map = eyes.mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
         Assert.assertEquals(map.keySet(), new HashSet<>(Arrays.asList(749, 750)));
         Assert.assertEquals(map.get(749).size(), 1);
