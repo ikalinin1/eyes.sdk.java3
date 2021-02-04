@@ -1070,14 +1070,12 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     }
 
     public static PositionProvider getPositionProviderForScrollRootElement(Logger logger, EyesSeleniumDriver driver, StitchMode stitchMode, UserAgent ua, WebElement scrollRootElement) {
-        PositionProvider positionProvider = PositionProviderFactory.tryGetPositionProviderForElement(scrollRootElement);
-        if (positionProvider == null) {
-            WebElement defaultSRE = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
-            if (scrollRootElement.equals(defaultSRE)) {
-                positionProvider = PositionProviderFactory.getPositionProvider(logger, stitchMode, driver, scrollRootElement, ua);
-            } else {
-                positionProvider = new ElementPositionProvider(logger, driver, scrollRootElement);
-            }
+        PositionProvider positionProvider = null;
+        WebElement defaultSRE = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
+        if (scrollRootElement.equals(defaultSRE)) {
+            positionProvider = PositionProviderFactory.getPositionProvider(logger, stitchMode, driver, scrollRootElement, ua);
+        } else {
+            positionProvider = new ElementPositionProvider(logger, driver, scrollRootElement);
         }
         return positionProvider;
     }
