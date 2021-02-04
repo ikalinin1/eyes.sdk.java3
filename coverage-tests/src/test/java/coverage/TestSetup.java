@@ -1,6 +1,7 @@
 package coverage;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
@@ -8,6 +9,7 @@ import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -37,6 +39,7 @@ public class TestSetup extends GlobalSetup {
         eyes.setParentBranchName("master");
         eyes.setBatch(batch);
         eyes.setSaveNewTests(false);
+        eyes.setLogHandler(new StdoutLogHandler());
         String showLogs = System.getenv("APPLITOOLS_SHOW_LOGS");
         String verbose = System.getenv("APPLITOOLS_SHOW_LOGS_VERBOSE");
         if (showLogs != null && showLogs.equals("true")) {
@@ -83,6 +86,7 @@ public class TestSetup extends GlobalSetup {
                 e.printStackTrace();
                 Assert.fail("Exception appeared while getting session results");
             }
+        eyes.getLogger().log("", Stage.CLOSE, Pair.of("sessionResults", sessionResults));
         return sessionResults;
     }
 
