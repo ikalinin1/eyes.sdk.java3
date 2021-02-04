@@ -2,6 +2,7 @@
 ### Update
 - Cleanup cached data after check() execution. [Trello 1673](https://trello.com/c/CYbkzXia)
 - Using original view location on the screen for the Android scroll. [Trello 2138](https://trello.com/c/EI2mxmTD)
+- Added support in Batch Custom Properties. [Trello 2445](https://trello.com/c/IKTydXLv)
 ### Fixed
 - Didn't add escaping to css files when collecting dom for RCA. [Trello 2444](https://trello.com/c/yIez6VxK)
 
